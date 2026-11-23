@@ -1,0 +1,394 @@
+/* ——— Tokens ——— */
+:root {
+  --bg: #191919;
+  --surface: #202020;      /* hover, controles */
+  --surface-2: #262626;    /* item ativo */
+  --line: rgba(247, 220, 158, 0.08);
+  --ink: #f7dc9e;          /* texto principal */
+  --ink-2: rgba(247, 220, 158, 0.62);
+  --ink-3: rgba(247, 220, 158, 0.34);
+  --serif: "Instrument Serif", Georgia, serif;
+  --sans: "Geist Variable", "Segoe UI", sans-serif;
+  --mono: "Geist Mono Variable", Consolas, monospace;
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html, body, #root { height: 100%; margin: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 15px;
+  -webkit-font-smoothing: antialiased;
+  user-select: none;
+  overflow: hidden;
+}
+
+button, input {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  padding: 0;
+}
+button { cursor: pointer; }
+input { outline: none; user-select: text; }
+::selection { background: rgba(247, 220, 158, 0.25); }
+:focus-visible { outline: 1px solid var(--ink-3); outline-offset: 2px; }
+
+kbd {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--ink-2);
+  padding: 2px 6px;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  background: var(--surface);
+}
+
+/* ——— Layout ——— */
+.app { height: 100%; display: flex; flex-direction: column; }
+
+.page {
+  flex: 1;
+  overflow-y: auto;
+  width: 100%;
+  max-width: 620px;
+  margin: 0 auto;
+  padding: 36px 28px 64px;
+  animation: enter 320ms var(--ease);
+  scrollbar-width: thin;
+  scrollbar-color: var(--surface-2) transparent;
+}
+.page.wide { max-width: 940px; }
+
+@keyframes enter {
+  from { opacity: 0; transform: translateY(6px); }
+}
+
+/* ——— Navegação (topo, centralizada) ——— */
+.nav { display: flex; justify-content: center; padding: 18px 16px 0; }
+.nav-track {
+  position: relative;
+  display: flex;
+  gap: 2px;
+  padding: 4px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+}
+.nav-pill {
+  position: absolute;
+  top: 4px;
+  bottom: 4px;
+  left: 0;
+  background: var(--surface-2);
+  border-radius: 999px;
+  box-shadow: inset 0 0 0 1px var(--line);
+  transition: transform 300ms var(--ease), width 300ms var(--ease);
+}
+.nav-track button {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 16px;
+  border-radius: 999px;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--ink-3);
+  transition: color 200ms;
+}
+.nav-track button:hover { color: var(--ink-2); }
+.nav-track button.active { color: var(--ink); }
+.nav-count {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  min-width: 18px;
+  padding: 1px 5px;
+  border-radius: 999px;
+  background: rgba(247, 220, 158, 0.1);
+  color: var(--ink-2);
+  text-align: center;
+}
+
+/* ——— Cabeçalho ——— */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+.eyebrow {
+  margin: 0 0 4px;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.title {
+  margin: 0;
+  font-family: var(--serif);
+  font-weight: 400;
+  font-size: 42px;
+  line-height: 1.05;
+  letter-spacing: -0.01em;
+}
+.title::first-letter { text-transform: uppercase; }
+.hint { margin: -6px 0 16px; font-size: 13px; color: var(--ink-3); }
+.empty { color: var(--ink-3); font-family: var(--serif); font-style: italic; font-size: 22px; }
+
+.segmented {
+  display: flex;
+  padding: 3px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+.segmented button {
+  padding: 5px 11px;
+  border-radius: 6px;
+  font-size: 12.5px;
+  color: var(--ink-3);
+  transition: color 200ms, background 200ms;
+}
+.segmented button.active { background: var(--surface-2); color: var(--ink); }
+
+/* ——— Progresso ——— */
+.progress { display: flex; align-items: center; gap: 10px; margin-bottom: 18px; }
+.progress-bar { flex: 1; height: 2px; background: var(--line); border-radius: 2px; overflow: hidden; }
+.progress-bar span {
+  display: block;
+  height: 100%;
+  background: var(--ink);
+  border-radius: 2px;
+  transition: width 500ms var(--ease);
+}
+.progress-label { font-family: var(--mono); font-size: 11px; color: var(--ink-3); }
+
+/* ——— Lista ——— */
+.tasks, .history-list, .column ul { list-style: none; margin: 0; padding: 0; }
+
+.task {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 46px;
+  padding: 8px 10px;
+  margin: 0 -10px;
+  border-radius: 8px;
+  font-size: 15.5px;
+  line-height: 1.4;
+  outline: none;
+  touch-action: none;
+  transition: background 150ms;
+}
+.task + .task { box-shadow: 0 -1px 0 var(--line); }
+.task:hover, .task:focus-visible { background: var(--surface); box-shadow: none; }
+.task:hover + .task, .task:focus-visible + .task { box-shadow: none; }
+.task.dragging { position: relative; z-index: 2; background: var(--surface-2); box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4); }
+
+.task-text {
+  position: relative;
+  flex: 0 1 auto; /* largura = tamanho do texto, assim o risco acompanha o texto */
+  min-width: 0;
+  overflow-wrap: anywhere;
+  cursor: text;
+  transition: color 300ms;
+}
+.task .task-text + * { margin-left: auto; } /* empurra as ações para a direita */
+.task.done .task-text { color: var(--ink-3); }
+.task-edit { flex: 1; min-width: 0; }
+
+/* fazendo (vindo do kanban): um ponto sólido antes do texto */
+.task.doing .task-text::before {
+  content: "";
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  margin: 0 9px 2px 0;
+  border-radius: 50%;
+  background: var(--ink);
+  box-shadow: 0 0 0 3px rgba(247, 220, 158, 0.15);
+}
+
+.task-del, .action {
+  font-size: 12px;
+  color: var(--ink-3);
+  padding: 4px 8px;
+  border-radius: 6px;
+  opacity: 0;
+  transition: opacity 150ms, color 150ms, background 150ms;
+}
+.task:hover .task-del, .task:focus-visible .task-del,
+.task:hover .action, .task:focus-visible .action { opacity: 1; }
+.task-del:hover { color: var(--ink); background: var(--surface-2); }
+.action { color: var(--ink-2); border: 1px solid var(--line); }
+.action:hover { color: var(--bg); background: var(--ink); }
+.tag { font-family: var(--mono); font-size: 11px; color: var(--ink-3); }
+
+/* ——— Checkbox (SVG desenhado à mão) ——— */
+.check { width: 22px; height: 22px; flex: none; display: grid; place-items: center; }
+.check svg { width: 100%; height: 100%; overflow: visible; }
+.check path { fill: none; stroke: var(--ink); stroke-linecap: round; stroke-linejoin: round; }
+.check .box { stroke-width: 1.5; opacity: 0.45; transition: opacity 150ms; }
+.check:hover .box { opacity: 0.9; }
+.check .tick { stroke-width: 2.2; stroke-dasharray: 1; animation: draw 260ms ease-out both; }
+
+/* ——— Risco da tarefa concluída ——— */
+.strike {
+  position: absolute;
+  left: -3px;
+  width: calc(100% + 6px); /* SVG é elemento "replaced": left+right não esticam, precisa de width explícito */
+  top: 52%;
+  height: 0.7em;
+  transform: translateY(-50%);
+  overflow: visible;
+  pointer-events: none;
+}
+.strike path {
+  fill: none;
+  stroke: var(--ink);
+  stroke-opacity: 0.75;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-dasharray: 1;
+  animation: draw 380ms cubic-bezier(0.3, 0.7, 0.4, 1) both;
+}
+@keyframes draw {
+  from { stroke-dashoffset: 1; }
+  to { stroke-dashoffset: 0; }
+}
+
+/* ——— Nova tarefa ——— */
+.new-task {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 46px;
+  margin: 6px -10px 0;
+  padding: 8px 10px;
+  border: 1px dashed var(--line);
+  border-radius: 8px;
+  cursor: text;
+  transition: border-color 150ms, background 150ms;
+}
+.new-task:focus-within { border-style: solid; border-color: rgba(247, 220, 158, 0.2); background: var(--surface); }
+.new-plus { width: 22px; text-align: center; color: var(--ink-3); font-size: 18px; }
+.new-task input { flex: 1; font-size: 15.5px; }
+.new-task input::placeholder { color: var(--ink-3); }
+.new-task kbd { opacity: 0; transition: opacity 150ms; }
+.new-task kbd.visible { opacity: 1; }
+
+/* ——— Kanban ——— */
+.kanban { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 8px; }
+.column {
+  min-height: 260px;
+  padding: 14px 12px;
+  background: #1d1d1d;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  transition: border-color 150ms, background 150ms;
+}
+.column.over { border-color: rgba(247, 220, 158, 0.28); background: var(--surface); }
+.column h2 {
+  display: flex;
+  justify-content: space-between;
+  margin: 0 2px 12px;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--ink-2);
+}
+.col-count { font-family: var(--mono); font-size: 11px; color: var(--ink-3); font-weight: 400; }
+.column ul { display: flex; flex-direction: column; gap: 6px; }
+.card {
+  padding: 10px 12px;
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  font-size: 14px;
+  line-height: 1.4;
+  cursor: grab;
+  touch-action: none;
+  transition: border-color 150ms;
+}
+.card:hover { border-color: rgba(247, 220, 158, 0.18); }
+.card.dragging { position: relative; z-index: 3; cursor: grabbing; box-shadow: 0 10px 28px rgba(0, 0, 0, 0.5); }
+.card .task-text { cursor: inherit; }
+.col-done .task-text { color: var(--ink-3); }
+
+/* ——— Histórico ——— */
+.history-day { padding: 14px 0; border-top: 1px solid var(--line); }
+.history-head { display: flex; align-items: center; gap: 20px; }
+.history-head h2 {
+  margin: 0;
+  min-width: 190px;
+  font-family: var(--serif);
+  font-weight: 400;
+  font-size: 21px;
+}
+.history-head h2::first-letter { text-transform: uppercase; }
+.history-head .progress { flex: 1; margin: 0; }
+.empty-day h2 { color: var(--ink-3); }
+.history-list { margin-top: 8px; }
+.history-list li { padding: 3px 0; font-size: 14px; }
+.history-list .task-text { cursor: default; flex: none; }
+.history-list .done .task-text { color: var(--ink-3); }
+.history-list .strike path { animation: none; }
+
+/* ——— Ajuda ——— */
+.help-btn {
+  position: fixed;
+  right: 16px;
+  bottom: 14px;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--ink-3);
+  border: 1px solid var(--line);
+  transition: color 150ms, border-color 150ms;
+}
+.help-btn:hover { color: var(--ink); border-color: var(--ink-3); }
+
+.help {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: rgba(10, 10, 10, 0.6);
+  backdrop-filter: blur(3px);
+  animation: fade 160ms ease-out;
+}
+@keyframes fade { from { opacity: 0; } }
+.help-card {
+  width: min(400px, calc(100% - 32px));
+  padding: 20px 22px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  animation: enter 220ms var(--ease);
+}
+.help-card h2 { margin: 0 0 12px; font-family: var(--serif); font-weight: 400; font-size: 24px; }
+.help dl { margin: 0; }
+.help dl div { display: flex; justify-content: space-between; align-items: center; padding: 7px 0; font-size: 13.5px; }
+.help dl div + div { border-top: 1px solid var(--line); }
+.help dt { color: var(--ink-2); }
+.help dd { margin: 0; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 1ms !important; transition-duration: 1ms !important; }
+}
+
+@media (max-width: 640px) {
+  .kanban { grid-template-columns: 1fr; }
+  .nav-track button { padding: 7px 11px; }
+  .history-head h2 { min-width: 0; }
+}

@@ -1,0 +1,7 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "default",
+  "description": "Permissões da janela principal: só o core e o store.",
+  "windows": ["main"],
+  "permissions": ["core:default", "store:default"]
+}

@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="2 1.5 21 21" width="1024" height="1024">
+  <g stroke="#F7DC9E" stroke-linecap="round" stroke-linejoin="round">
+    <!-- caixa: interior preenchido com o fundo do app -->
+    <path fill="#191919" stroke-width="1.5" d="M4.3 5.1 C 9 4.6, 15 4.2, 19.7 4.9 C 19.4 10, 20.2 15, 19.5 19.6 C 14 20.1, 9 19.5, 4.6 20 C 4.7 15, 3.9 10, 4.3 5.1 Z"/>
+    <!-- ✓: a ponta passa um pouco da borda da caixa, como num caderno -->
+    <path fill="none" stroke-width="2.2" d="M7.2 12.6 C 8.5 13.8, 9.6 15, 10.6 16.3 C 12.8 12.2, 15.8 8.2, 21.2 3.1"/>
+  </g>
+</svg>
