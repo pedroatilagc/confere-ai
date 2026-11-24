@@ -9,11 +9,12 @@ interface Props {
   task: Task;
   sortable: boolean;
   extra?: ReactNode;
+  completable?: boolean; // false em "Amanhã": não pode concluir nem marcar "fazendo"
 }
 
 const focusEl = (el: Element | null) => (el as HTMLElement | null)?.focus();
 
-export function TaskItem({ task, sortable, extra }: Props) {
+export function TaskItem({ task, sortable, extra, completable = true }: Props) {
   const { edit, setStatus, remove } = useTasks();
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(task.text);
@@ -22,8 +23,11 @@ export function TaskItem({ task, sortable, extra }: Props) {
     disabled: !sortable || editing,
   });
 
-  const done = task.status === "done";
-  const toggle = () => setStatus(task.id, done ? "todo" : "done");
+  const done = completable && task.status === "done";
+  const doing = completable && task.status === "doing";
+  const toggle = () => {
+    if (completable) setStatus(task.id, done ? "todo" : "done");
+  };
 
   const save = () => {
     const text = draft.trim();
@@ -65,7 +69,7 @@ export function TaskItem({ task, sortable, extra }: Props) {
     }
   };
 
-  const cls = ["task", done && "done", task.status === "doing" && "doing", isDragging && "dragging"]
+  const cls = ["task", done && "done", doing && "doing", isDragging && "dragging"]
     .filter(Boolean)
     .join(" ");
 
@@ -78,7 +82,13 @@ export function TaskItem({ task, sortable, extra }: Props) {
       onKeyDown={onKeyDown}
       {...listeners}
     >
-      <ChalkCheckbox checked={done} onToggle={toggle} />
+      {completable ? (
+        <ChalkCheckbox checked={done} onToggle={toggle} />
+      ) : (
+        <span className="check-placeholder" aria-hidden>
+          –
+        </span>
+      )}
       {editing ? (
         <input
           className="task-edit"

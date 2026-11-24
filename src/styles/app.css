@@ -240,6 +240,16 @@ kbd {
 .check:hover .box { opacity: 0.9; }
 .check .tick { stroke-width: 2.2; stroke-dasharray: 1; animation: draw 260ms ease-out both; }
 
+/* marcador neutro no lugar do checkbox (Amanhã): mesmo tamanho, alinhamento não pula */
+.check-placeholder {
+  width: 22px;
+  height: 22px;
+  flex: none;
+  display: grid;
+  place-items: center;
+  color: var(--ink-3);
+}
+
 /* ——— Risco da tarefa concluída ——— */
 .strike {
   position: absolute;

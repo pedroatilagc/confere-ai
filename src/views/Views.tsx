@@ -62,7 +62,7 @@ export function Tomorrow() {
       <p className="hint">
         {list.length === 0 ? "Anote o que vem amanhã. Tudo aqui aparece em Hoje quando o dia virar." : `${list.length} planejada${list.length > 1 ? "s" : ""}`}
       </p>
-      <TaskList tasks={list} date={tomorrow} />
+      <TaskList tasks={list} date={tomorrow} completable={false} />
     </>
   );
 }

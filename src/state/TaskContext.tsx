@@ -69,8 +69,16 @@ export function TaskProvider({ children }: { children: ReactNode }) {
         },
       ]),
     edit: (id, text) => patch(id, { text }),
+    // Regra de negócio também na camada de dados: tarefa de dia futuro
+    // não muda de status, venha a chamada da UI ou (no futuro) do agente.
     setStatus: (id, status) =>
-      patch(id, { status, completedAt: status === "done" ? new Date().toISOString() : undefined }),
+      change((ts) =>
+        ts.map((t) =>
+          t.id === id && t.date <= today
+            ? { ...t, status, completedAt: status === "done" ? new Date().toISOString() : undefined }
+            : t,
+        ),
+      ),
     remove: (id) => change((ts) => ts.filter((t) => t.id !== id)),
     moveToToday: (id) =>
       change((ts) => ts.map((t) => (t.id === id ? { ...t, date: today, order: nextOrder(ts, today) } : t))),

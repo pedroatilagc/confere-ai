@@ -10,9 +10,10 @@ interface Props {
   tasks: Task[];
   date?: string; // presente = dá para adicionar e reordenar nesse dia
   extra?: (t: Task) => ReactNode;
+  completable?: boolean;
 }
 
-export function TaskList({ tasks, date, extra }: Props) {
+export function TaskList({ tasks, date, extra, completable = true }: Props) {
   const { reorder } = useTasks();
   // O arraste só começa depois de 6 px; assim clicar e editar continuam funcionando.
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 6 } }));
@@ -29,7 +30,7 @@ export function TaskList({ tasks, date, extra }: Props) {
         <SortableContext items={tasks.map((t) => t.id)} strategy={verticalListSortingStrategy}>
           <ul className="tasks">
             {tasks.map((t) => (
-              <TaskItem key={t.id} task={t} sortable={!!date} extra={extra?.(t)} />
+              <TaskItem key={t.id} task={t} sortable={!!date} extra={extra?.(t)} completable={completable} />
             ))}
           </ul>
         </SortableContext>
