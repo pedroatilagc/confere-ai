@@ -1,9 +1,13 @@
-import { useState, type KeyboardEvent, type ReactNode } from "react";
+import { useRef, useState, type KeyboardEvent, type ReactNode } from "react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import type { Task } from "../types";
 import { useTasks } from "../state/TaskContext";
+import { useOpenNote } from "../state/noteOpener";
 import { ChalkCheckbox, Strike } from "./Chalk";
+import { NoteIcon } from "./Icons";
+import { TaskMenu } from "./TaskMenu";
+import { ConfirmPopover } from "./ConfirmPopover";
 
 interface Props {
   task: Task;
@@ -16,11 +20,14 @@ const focusEl = (el: Element | null) => (el as HTMLElement | null)?.focus();
 
 export function TaskItem({ task, sortable, extra, completable = true }: Props) {
   const { edit, setStatus, remove } = useTasks();
+  const openNote = useOpenNote();
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(task.text);
+  const [confirming, setConfirming] = useState(false);
+  const liRef = useRef<HTMLLIElement | null>(null);
   const { setNodeRef, listeners, transform, transition, isDragging } = useSortable({
     id: task.id,
-    disabled: !sortable || editing,
+    disabled: !sortable || editing || confirming,
   });
 
   const done = completable && task.status === "done";
@@ -40,14 +47,21 @@ export function TaskItem({ task, sortable, extra, completable = true }: Props) {
     setEditing(false);
   };
 
+  const doRemove = () => {
+    const li = liRef.current;
+    if (li) focusEl(li.nextElementSibling ?? li.previousElementSibling);
+    remove(task.id);
+  };
+  // Com nota, pede confirmação; sem nota, apaga direto.
+  const requestDelete = () => (task.note ? setConfirming(true) : doRemove());
+
   // Teclado com o item (li) em foco.
   const onKeyDown = (e: KeyboardEvent<HTMLLIElement>) => {
     if (e.target !== e.currentTarget) return;
     const li = e.currentTarget;
     switch (e.key) {
       case "Delete":
-        focusEl(li.nextElementSibling ?? li.previousElementSibling);
-        remove(task.id);
+        requestDelete();
         break;
       case " ":
         e.preventDefault();
@@ -69,13 +83,16 @@ export function TaskItem({ task, sortable, extra, completable = true }: Props) {
     }
   };
 
-  const cls = ["task", done && "done", doing && "doing", isDragging && "dragging"]
+  const cls = ["task", done && "done", doing && "doing", isDragging && "dragging", confirming && "raised"]
     .filter(Boolean)
     .join(" ");
 
   return (
     <li
-      ref={setNodeRef}
+      ref={(el) => {
+        setNodeRef(el);
+        liRef.current = el;
+      }}
       className={cls}
       tabIndex={0}
       style={{ transform: CSS.Translate.toString(transform), transition }}
@@ -108,10 +125,29 @@ export function TaskItem({ task, sortable, extra, completable = true }: Props) {
           {done && <Strike seed={task.id} />}
         </span>
       )}
-      {extra}
-      <button className="task-del" tabIndex={-1} onClick={() => remove(task.id)}>
-        Apagar
-      </button>
+      {task.note && !editing && (
+        <button className="note-ind" tabIndex={-1} onClick={() => openNote(task)} aria-label="Abrir nota" title="Abrir nota">
+          <NoteIcon />
+        </button>
+      )}
+      <div className="task-actions">
+        {extra}
+        <TaskMenu hasNote={!!task.note} onNotes={() => openNote(task)} onDelete={requestDelete} />
+      </div>
+      {confirming && (
+        <ConfirmPopover
+          message="Apagar esta tarefa? A nota dela também será apagada."
+          confirmLabel="Apagar tudo"
+          onConfirm={() => {
+            setConfirming(false);
+            doRemove();
+          }}
+          onCancel={() => {
+            setConfirming(false);
+            liRef.current?.focus();
+          }}
+        />
+      )}
     </li>
   );
 }

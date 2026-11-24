@@ -4,6 +4,7 @@ import { addDays, formatDay } from "../lib/dates";
 import { TaskList } from "../components/TaskList";
 import { Kanban } from "../components/Kanban";
 import { Strike } from "../components/Chalk";
+import { NotesSheet } from "./NotesSheet";
 
 function Progress({ tasks }: { tasks: Task[] }) {
   if (tasks.length === 0) return null;
@@ -32,23 +33,36 @@ function Header({ eyebrow, title, children }: { eyebrow: string; title: string; 
   );
 }
 
-export function Today({ mode, onMode }: { mode: Mode; onMode(m: Mode): void }) {
+const MODES: { id: Mode; label: string }[] = [
+  { id: "list", label: "Lista" },
+  { id: "kanban", label: "Kanban" },
+  { id: "notes", label: "Notas" },
+];
+
+interface TodayProps {
+  mode: Mode;
+  onMode(m: Mode): void;
+  focusId?: string; // nota a focar ao abrir o modo Notas
+}
+
+export function Today({ mode, onMode, focusId }: TodayProps) {
   const { tasks, today } = useTasks();
   const list = tasksOn(tasks, today);
   return (
     <>
       <Header eyebrow="Hoje" title={formatDay(today)}>
         <div className="segmented" role="tablist">
-          <button className={mode === "list" ? "active" : ""} onClick={() => onMode("list")}>
-            Lista
-          </button>
-          <button className={mode === "kanban" ? "active" : ""} onClick={() => onMode("kanban")}>
-            Kanban
-          </button>
+          {MODES.map((m) => (
+            <button key={m.id} className={mode === m.id ? "active" : ""} onClick={() => onMode(m.id)}>
+              {m.label}
+            </button>
+          ))}
         </div>
       </Header>
       <Progress tasks={list} />
-      {mode === "kanban" ? <Kanban tasks={list} date={today} /> : <TaskList tasks={list} date={today} />}
+      {mode === "list" && <TaskList tasks={list} date={today} />}
+      {mode === "kanban" && <Kanban tasks={list} date={today} />}
+      {mode === "notes" && <NotesSheet tasks={list} focusId={focusId} />}
     </>
   );
 }

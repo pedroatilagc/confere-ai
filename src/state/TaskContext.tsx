@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
-import type { Status, Task } from "../types";
+import type { JSONContent } from "@tiptap/react";
+import { NOTE_LIMIT, type Status, type Task } from "../types";
 import { loadTasks, purgeOld, saveTasks } from "../lib/storage";
 import { addDays } from "../lib/dates";
 import { useToday } from "./useToday";
@@ -14,6 +15,7 @@ interface TaskApi {
   remove(id: string): void;
   moveToToday(id: string): void;
   reorder(orderedIds: string[]): void;
+  setNote(id: string, doc: JSONContent, text: string): void;
 }
 
 const Ctx = createContext<TaskApi | null>(null);
@@ -84,6 +86,18 @@ export function TaskProvider({ children }: { children: ReactNode }) {
       change((ts) => ts.map((t) => (t.id === id ? { ...t, date: today, order: nextOrder(ts, today) } : t))),
     reorder: (ids) =>
       change((ts) => ts.map((t) => (ids.includes(t.id) ? { ...t, order: ids.indexOf(t.id) } : t))),
+    // Nota vazia = sem nota: o campo é removido.
+    setNote: (id, doc, text) =>
+      change((ts) =>
+        ts.map((t) => {
+          if (t.id !== id) return t;
+          if (!text.trim()) {
+            const { note: _removed, ...rest } = t;
+            return rest;
+          }
+          return { ...t, note: { doc, text: text.slice(0, NOTE_LIMIT), updatedAt: new Date().toISOString() } };
+        }),
+      ),
   };
 
   return <Ctx.Provider value={api}>{children}</Ctx.Provider>;
