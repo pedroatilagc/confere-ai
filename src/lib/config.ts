@@ -3,15 +3,11 @@ import { invoke } from "@tauri-apps/api/core";
 
 export interface AgentConfig {
   chatId: string | null;
-  openrouterKey: string;
-  model: string;
   agentEnabled: boolean;
 }
 
 export const DEFAULT_CONFIG: AgentConfig = {
   chatId: null,
-  openrouterKey: "",
-  model: "",
   agentEnabled: false,
 };
 
@@ -33,12 +29,9 @@ async function writeRaw(raw: Record<string, unknown>): Promise<void> {
 
 export async function loadConfig(): Promise<AgentConfig> {
   const raw = await readRaw();
-  if (typeof raw.botToken === "string") {
-    const { botToken, ...rest } = raw;
-    if (botToken.trim()) await invoke("set_bot_token", { token: botToken });
-    await writeRaw(rest);
-  }
-  const { botToken: _drop, ...rest } = raw;
+  const { botToken, openrouterKey, model, ...rest } = raw;
+  if (typeof botToken === "string" && botToken.trim()) await invoke("set_bot_token", { token: botToken });
+  if (botToken !== undefined || openrouterKey !== undefined || model !== undefined) await writeRaw(rest);
   return { ...DEFAULT_CONFIG, ...(rest as Partial<AgentConfig>) };
 }
 

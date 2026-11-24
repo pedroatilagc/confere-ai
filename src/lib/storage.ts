@@ -12,6 +12,7 @@ interface RawData {
   tasks?: unknown;
 }
 
+// Cada versão nova do formato ganha um passo aqui (if (v < 3) …), para arquivos antigos continuarem abrindo.
 export function migrate(raw: RawData): Task[] {
   let version = raw.version ?? 1;
   const tasks = (Array.isArray(raw.tasks) ? raw.tasks : []) as Task[];

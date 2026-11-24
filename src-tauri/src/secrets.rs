@@ -11,6 +11,7 @@ pub fn bot_token() -> Option<String> {
     entry().ok()?.get_password().ok().filter(|t| !t.is_empty())
 }
 
+// Não existe comando que devolva o token ao JavaScript: ele só sai do cofre dentro do Rust.
 #[tauri::command]
 pub fn set_bot_token(token: String) -> Result<(), String> {
     let token = token.trim();

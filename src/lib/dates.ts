@@ -1,3 +1,5 @@
+// Datas como "YYYY-MM-DD" no fuso local. Nunca usar toISOString() aqui: ele converte
+// para UTC e, depois das 21h em São Paulo, já devolveria o dia seguinte.
 const pad = (n: number) => String(n).padStart(2, "0");
 
 export function toKey(d: Date): string {

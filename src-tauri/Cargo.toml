@@ -1,8 +1,9 @@
 [package]
 name = "confereai"
 version = "0.1.0"
-description = "ConfereAi - to-do diaria"
-authors = ["you"]
+description = "ConfereAí: to-do diária para Windows com bot do Telegram"
+authors = ["pedroatilagc"]
+license = "MIT"
 edition = "2024"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html

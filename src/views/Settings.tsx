@@ -92,22 +92,6 @@ export function Settings({ onClose }: { onClose(): void }) {
           </section>
 
           <section className="settings-group">
-            <h2>Modelo (OpenRouter)</h2>
-            <Field label="Chave da API">
-              <SecretInput value={config.openrouterKey} onChange={(v) => update({ openrouterKey: v })} placeholder="sk-or-…" />
-            </Field>
-            <Field label="ID do modelo" hint="Como aparece no OpenRouter, no formato provedor/modelo.">
-              <input
-                className="input"
-                value={config.model}
-                onChange={(e) => update({ model: e.target.value })}
-                placeholder="provedor/modelo"
-                spellCheck={false}
-              />
-            </Field>
-          </section>
-
-          <section className="settings-group">
             <div className="switch-row">
               <div>
                 <h2>Agente ativo</h2>
@@ -127,7 +111,7 @@ export function Settings({ onClose }: { onClose(): void }) {
 
           <p className="settings-note">
             Salvo automaticamente em <code>config.json</code>, separado das tarefas. O token do bot fica no
-            Gerenciador de Credenciais do Windows; a chave do OpenRouter ainda fica em texto puro.
+            Gerenciador de Credenciais do Windows, nunca em arquivo.
           </p>
         </>
       )}

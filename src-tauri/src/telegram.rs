@@ -102,6 +102,7 @@ async fn poll_once<R: Runtime>(app: &AppHandle<R>, http: &reqwest::Client, token
     Ok(())
 }
 
+// Só o primeiro chat que mandar /start fica autorizado; mensagens de outros chats são ignoradas.
 async fn handle_message<R: Runtime>(app: &AppHandle<R>, http: &reqwest::Client, token: &str, msg: Message) {
     let chat = msg.chat.id.to_string();
     let text = msg.text.unwrap_or_default();
@@ -111,15 +112,19 @@ async fn handle_message<R: Runtime>(app: &AppHandle<R>, http: &reqwest::Client, 
         None if text.trim().starts_with("/start") => {
             set_config_value(app, "chatId", json!(chat));
             let _ = app.emit(CONFIG_EVENT, ());
-            send(http, token, &chat, "Pronto! Este chat está autorizado. Me mande suas tarefas, uma por linha. Use \"amanhã:\" no começo da linha para agendar para amanhã.").await;
+            send(http, token, &chat, "Pronto! Este chat está autorizado. Me mande suas tarefas, uma por linha. Use \"amanhã:\" no começo da linha para agendar para amanhã. /hoje e /amanha listam as tarefas.").await;
             return;
         }
         Some(ref c) if *c == chat => {}
         _ => return,
     }
 
-    if text.trim().starts_with('/') {
-        return;
+    let command = text.trim().split(['@', ' ']).next().unwrap_or("").to_lowercase();
+    match command.as_str() {
+        "/hoje" => return send(http, token, &chat, &list_day(app, 0)).await,
+        "/amanha" | "/amanhã" => return send(http, token, &chat, &list_day(app, 1)).await,
+        c if c.starts_with('/') => return,
+        _ => {}
     }
     let cmds = to_commands(&text);
     if cmds.is_empty() {
@@ -132,6 +137,33 @@ async fn handle_message<R: Runtime>(app: &AppHandle<R>, http: &reqwest::Client, 
         None => "Não consegui falar com o app. A janela está aberta?".into(),
     };
     send(http, token, &chat, &reply).await;
+}
+
+fn list_day<R: Runtime>(app: &AppHandle<R>, offset: u64) -> String {
+    let day = chrono::Local::now().date_naive() + chrono::Days::new(offset);
+    let key = day.format("%Y-%m-%d").to_string();
+    let title = if offset == 0 { "Hoje" } else { "Amanhã" };
+
+    let all = app
+        .store("tasks.json")
+        .ok()
+        .and_then(|s| s.get("tasks"))
+        .and_then(|v| v.as_array().cloned())
+        .unwrap_or_default();
+    let mut tasks: Vec<&Value> = all.iter().filter(|t| t["date"].as_str() == Some(key.as_str())).collect();
+    tasks.sort_by(|a, b| a["order"].as_f64().unwrap_or(0.0).total_cmp(&b["order"].as_f64().unwrap_or(0.0)));
+
+    if tasks.is_empty() {
+        return format!("{title}: nenhuma tarefa.");
+    }
+    let lines: Vec<String> = tasks
+        .iter()
+        .map(|t| {
+            let mark = if t["status"].as_str() == Some("done") { "☑" } else { "☐" };
+            format!("{mark} {}", t["text"].as_str().unwrap_or(""))
+        })
+        .collect();
+    format!("{title} ({})\n{}", tasks.len(), lines.join("\n"))
 }
 
 fn to_commands(text: &str) -> Vec<Value> {
@@ -153,6 +185,8 @@ fn to_commands(text: &str) -> Vec<Value> {
         .collect()
 }
 
+// As regras ficam no TypeScript (applyCommands). O Rust emite o evento e espera o resultado
+// do React num canal oneshot para poder responder no Telegram.
 async fn dispatch<R: Runtime>(app: &AppHandle<R>, cmds: Vec<Value>) -> Option<Value> {
     let pending = app.state::<Pending>();
     let id = pending.next.fetch_add(1, Ordering::Relaxed);
@@ -233,6 +267,7 @@ fn agent_enabled<R: Runtime>(app: &AppHandle<R>) -> bool {
     config_value(app, "agentEnabled").and_then(|v| v.as_bool()).unwrap_or(false)
 }
 
+// O offset confirma ao Telegram o que já foi lido, para não reprocessar mensagens ao reabrir o app.
 fn read_offset<R: Runtime>(app: &AppHandle<R>) -> i64 {
     app.store(CONFIG_FILE)
         .ok()
