@@ -600,6 +600,10 @@ kbd {
   color: var(--ink-3);
 }
 .secret-toggle:hover { color: var(--ink); background: var(--surface-2); }
+.secret-toggle:disabled { opacity: .4; pointer-events: none; }
+.secret-row { display: flex; align-items: center; gap: 8px; }
+.secret-row > .secret { flex: 1; }
+.secret-row > .secret-toggle { position: static; transform: none; border: 1px solid var(--line); padding: 8px 12px; }
 
 .switch-row { display: flex; justify-content: space-between; align-items: center; gap: 16px; }
 .switch-row h2 { margin-bottom: 4px; }

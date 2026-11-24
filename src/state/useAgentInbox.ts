@@ -19,7 +19,11 @@ export function useAgentInbox() {
   useEffect(() => {
     let unlisten: (() => void) | undefined;
     let cancelled = false;
-    listen<unknown>(AGENT_EVENT, (e) => applyRef.current(e.payload)).then((fn) => {
+    listen<{ id: number | null; cmds: unknown }>(AGENT_EVENT, (e) => {
+      const { id, cmds } = e.payload;
+      const result = applyRef.current(cmds);
+      if (id !== null) invoke("agent_result", { id, result }).catch(console.error);
+    }).then((fn) => {
       if (cancelled) fn();
       else unlisten = fn;
     });

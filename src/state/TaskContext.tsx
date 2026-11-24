@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from "react";
 import type { JSONContent } from "@tiptap/react";
 import type { Status, Task } from "../types";
 import { loadTasks, purgeOld, saveTasks } from "../lib/storage";
@@ -19,7 +19,7 @@ interface TaskApi {
   moveToToday(id: string): void;
   reorder(orderedIds: string[]): void;
   setNote(id: string, doc: JSONContent, text: string): void;
-  applyAgent(cmds: unknown): void;
+  applyAgent(cmds: unknown): Pick<domain.ApplyResult, "applied" | "rejected">;
 }
 
 const Ctx = createContext<TaskApi | null>(null);
@@ -28,6 +28,8 @@ export function TaskProvider({ children }: { children: ReactNode }) {
   const today = useToday();
   const [tasks, setTasks] = useState<Task[] | null>(null);
   const loaded = tasks !== null;
+  const tasksRef = useRef(tasks);
+  tasksRef.current = tasks;
 
   useEffect(() => {
     loadTasks().then(setTasks).catch((e) => {
@@ -59,12 +61,13 @@ export function TaskProvider({ children }: { children: ReactNode }) {
     moveToToday: (id) => change((ts) => domain.moveToToday(ts, id, today)),
     reorder: (ids) => change((ts) => domain.reorder(ts, ids)),
     setNote: (id, doc, text) => change((ts) => domain.setNote(ts, id, doc, text)),
-    applyAgent: (cmds) =>
-      change((ts) => {
-        const result = domain.applyCommands(ts, cmds, today);
-        console.info("[agent]", { applied: result.applied, rejected: result.rejected });
-        return result.tasks;
-      }),
+    applyAgent: (cmds) => {
+      const result = domain.applyCommands(tasksRef.current ?? [], cmds, today);
+      tasksRef.current = result.tasks;
+      setTasks(result.tasks);
+      console.info("[agent]", { applied: result.applied, rejected: result.rejected });
+      return { applied: result.applied, rejected: result.rejected };
+    },
   };
 
   return <Ctx.Provider value={api}>{children}</Ctx.Provider>;

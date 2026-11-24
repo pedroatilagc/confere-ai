@@ -1,12 +1,31 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
-import { DEFAULT_CONFIG, loadConfig, saveConfig, type AgentConfig } from "../lib/config";
+import { listen } from "@tauri-apps/api/event";
+import {
+  DEFAULT_CONFIG,
+  clearBotToken,
+  hasBotToken,
+  loadConfig,
+  saveConfig,
+  setBotToken,
+  unlinkChat,
+  type AgentConfig,
+  type EditableConfig,
+} from "../lib/config";
 
 const SAVE_DELAY = 500;
 
 export function Settings({ onClose }: { onClose(): void }) {
   const [config, setConfig] = useState<AgentConfig | null>(null);
   const timer = useRef<number | undefined>(undefined);
-  const pending = useRef<AgentConfig | null>(null);
+  const pending = useRef<Partial<EditableConfig> | null>(null);
+
+  useEffect(() => {
+    const refreshChat = () => loadConfig().then((c) => setConfig((prev) => prev && { ...prev, chatId: c.chatId }));
+    const off = listen("agent://config", refreshChat);
+    return () => {
+      off.then((fn) => fn());
+    };
+  }, []);
 
   useEffect(() => {
     loadConfig()
@@ -21,17 +40,21 @@ export function Settings({ onClose }: { onClose(): void }) {
     };
   }, []);
 
-  const update = (patch: Partial<AgentConfig>) => {
-    setConfig((c) => {
-      const next = { ...(c ?? DEFAULT_CONFIG), ...patch };
-      pending.current = next;
-      window.clearTimeout(timer.current);
-      timer.current = window.setTimeout(() => {
-        pending.current = null;
-        saveConfig(next).catch(console.error);
-      }, SAVE_DELAY);
-      return next;
-    });
+  const update = (patch: Partial<EditableConfig>) => {
+    setConfig((c) => ({ ...(c ?? DEFAULT_CONFIG), ...patch }));
+    const toSave = { ...pending.current, ...patch };
+    pending.current = toSave;
+    window.clearTimeout(timer.current);
+    timer.current = window.setTimeout(() => {
+      pending.current = null;
+      saveConfig(toSave).catch(console.error);
+    }, SAVE_DELAY);
+  };
+
+  const unlink = () => {
+    unlinkChat()
+      .then(() => setConfig((c) => c && { ...c, chatId: null }))
+      .catch(console.error);
   };
 
   return (
@@ -55,11 +78,16 @@ export function Settings({ onClose }: { onClose(): void }) {
         <>
           <section className="settings-group">
             <h2>Telegram</h2>
-            <Field label="Token do bot" hint="Crie o seu bot no @BotFather e cole o token aqui.">
-              <SecretInput value={config.botToken} onChange={(v) => update({ botToken: v })} placeholder="123456:ABC…" />
-            </Field>
+            <BotTokenField />
             <Field label="Chat autorizado" hint="Preenchido automaticamente quando você enviar /start ao bot.">
-              <input className="input" value={config.chatId ?? "—"} readOnly tabIndex={-1} />
+              <div className="secret">
+                <input className="input" value={config.chatId ?? "—"} readOnly tabIndex={-1} />
+                {config.chatId && (
+                  <button type="button" className="secret-toggle" onClick={unlink}>
+                    Desvincular
+                  </button>
+                )}
+              </div>
             </Field>
           </section>
 
@@ -83,7 +111,7 @@ export function Settings({ onClose }: { onClose(): void }) {
             <div className="switch-row">
               <div>
                 <h2>Agente ativo</h2>
-                <p className="hint">Sem efeito até a integração com o Telegram ser implementada.</p>
+                <p className="hint">Liga o bot do Telegram enquanto o app estiver aberto.</p>
               </div>
               <button
                 role="switch"
@@ -98,12 +126,59 @@ export function Settings({ onClose }: { onClose(): void }) {
           </section>
 
           <p className="settings-note">
-            Salvo automaticamente em <code>config.json</code>, separado das tarefas. As chaves ficam em texto puro
-            neste computador.
+            Salvo automaticamente em <code>config.json</code>, separado das tarefas. O token do bot fica no
+            Gerenciador de Credenciais do Windows; a chave do OpenRouter ainda fica em texto puro.
           </p>
         </>
       )}
     </div>
+  );
+}
+
+function BotTokenField() {
+  const [saved, setSaved] = useState<boolean | null>(null);
+  const [draft, setDraft] = useState("");
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    hasBotToken().then(setSaved).catch(() => setSaved(false));
+  }, []);
+
+  const save = () => {
+    setBotToken(draft)
+      .then(() => {
+        setDraft("");
+        setError("");
+        setSaved(true);
+      })
+      .catch((e) => setError(String(e)));
+  };
+  const remove = () => {
+    clearBotToken().then(() => setSaved(false)).catch((e) => setError(String(e)));
+  };
+
+  if (saved === null) return null;
+  return (
+    <Field
+      label="Token do bot"
+      hint={error || (saved ? "Guardado no Gerenciador de Credenciais do Windows." : "Crie o seu bot no @BotFather e cole o token aqui.")}
+    >
+      {saved ? (
+        <div className="secret">
+          <input className="input" value="Configurado ✓" readOnly tabIndex={-1} />
+          <button type="button" className="secret-toggle" onClick={remove}>
+            Remover
+          </button>
+        </div>
+      ) : (
+        <div className="secret-row">
+          <SecretInput value={draft} onChange={setDraft} placeholder="123456:ABC…" />
+          <button type="button" className="secret-toggle" onClick={save} disabled={!draft.trim()}>
+            Salvar
+          </button>
+        </div>
+      )}
+    </Field>
   );
 }
 

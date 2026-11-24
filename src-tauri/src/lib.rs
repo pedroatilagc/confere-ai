@@ -1,4 +1,6 @@
 mod agent;
+mod secrets;
+mod telegram;
 
 use tauri_plugin_autostart::MacosLauncher;
 #[cfg(not(debug_assertions))]
@@ -17,13 +19,25 @@ pub fn run() {
                     let _ = autostart.enable();
                 }
             }
-            #[cfg(debug_assertions)]
-            let _ = app;
+            telegram::spawn_poller(app.handle().clone());
             Ok(())
         });
 
     #[cfg(debug_assertions)]
-    let builder = builder.invoke_handler(tauri::generate_handler![agent::debug_inject]);
+    let builder = builder.invoke_handler(tauri::generate_handler![
+        agent::debug_inject,
+        telegram::agent_result,
+        secrets::set_bot_token,
+        secrets::clear_bot_token,
+        secrets::has_bot_token,
+    ]);
+    #[cfg(not(debug_assertions))]
+    let builder = builder.invoke_handler(tauri::generate_handler![
+        telegram::agent_result,
+        secrets::set_bot_token,
+        secrets::clear_bot_token,
+        secrets::has_bot_token,
+    ]);
 
     builder
         .run(tauri::generate_context!())
