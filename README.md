@@ -3,7 +3,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/pedroatilagc/confere-ai/releases/latest">
+  <a href="https://github.com/pedroatilagc/confere-ai/releases/latest/download/ConfereAi-setup.exe">
     <img src="docs/readme/download.svg" alt="Baixar para Windows (.exe)" height="52">
   </a>
 </p>
@@ -64,7 +64,7 @@ Quem fecha o dia anotando as tarefas de amanhã começa a manhã **decidindo men
 
 ## Instalação
 
-1. Baixe o instalador em **[Releases](https://github.com/pedroatilagc/confere-ai/releases/latest)** (`ConfereAí_x.y.z_x64-setup.exe`).
+1. Baixe o instalador pelo botão acima ou em **[Releases](https://github.com/pedroatilagc/confere-ai/releases/latest)** (`ConfereAi-setup.exe`).
 2. Execute. O instalador é por usuário e não pede permissão de administrador.
    - Se o Windows SmartScreen avisar que o app é desconhecido, clique em **Mais informações → Executar assim mesmo**. O aviso aparece porque o instalador não tem assinatura digital paga; o código está todo aqui no repositório.
 3. Pronto. O ConfereAí passa a abrir sozinho quando você liga o computador.
