@@ -10,7 +10,6 @@ import {
 import { CSS } from "@dnd-kit/utilities";
 import type { Status, Task } from "../types";
 import { useTasks } from "../state/TaskContext";
-import { Strike } from "./Chalk";
 import { NewTask } from "./NewTask";
 
 const COLUMNS: { status: Status; label: string }[] = [
@@ -68,10 +67,7 @@ function Card({ task }: { task: Task }) {
       {...listeners}
       {...attributes}
     >
-      <span className="task-text">
-        {task.text}
-        {task.status === "done" && <Strike seed={task.id} />}
-      </span>
+      <span className="task-text">{task.text}</span>
     </li>
   );
 }

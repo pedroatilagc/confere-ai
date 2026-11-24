@@ -321,6 +321,8 @@ kbd {
 .card.dragging { position: relative; z-index: 3; cursor: grabbing; box-shadow: 0 10px 28px rgba(0, 0, 0, 0.5); }
 .card .task-text { cursor: inherit; }
 .col-done .task-text { color: var(--ink-3); }
+.col-done .card { opacity: 0.6; transition: opacity 150ms var(--ease), border-color 150ms; }
+.col-done .card:hover, .col-done .card.dragging { opacity: 1; }
 
 /* ——— Histórico ——— */
 .history-day { padding: 14px 0; border-top: 1px solid var(--line); }
