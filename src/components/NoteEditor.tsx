@@ -8,7 +8,7 @@ import { NOTE_LIMIT, type Task } from "../types";
 import { useTasks } from "../state/TaskContext";
 import { HighlighterIcon } from "./Icons";
 
-const SAVE_DELAY = 500; // ms sem digitar antes de gravar (debounce)
+const SAVE_DELAY = 500;
 const fmt = new Intl.NumberFormat("pt-BR");
 
 interface Props {
@@ -21,8 +21,6 @@ export function NoteEditor({ task, autoFocus = false }: Props) {
   const setNoteRef = useRef(setNote);
   setNoteRef.current = setNote;
 
-  // Debounce: cada atualização guarda o conteúdo pendente e reinicia o timer.
-  // Só grava quando o timer vence (ou no blur / ao desmontar).
   const timer = useRef<number | undefined>(undefined);
   const pending = useRef<{ doc: JSONContent; text: string } | null>(null);
   const flush = () => {
@@ -35,7 +33,6 @@ export function NoteEditor({ task, autoFocus = false }: Props) {
 
   const editor = useEditor({
     extensions: [
-      // Só parágrafos, quebras de linha, listas simples e desfazer/refazer.
       StarterKit.configure({
         heading: false,
         codeBlock: false,
@@ -48,7 +45,7 @@ export function NoteEditor({ task, autoFocus = false }: Props) {
         underline: false,
         link: false,
       }),
-      Highlight, // Ctrl+Shift+H alterna o grifo
+      Highlight,
       CharacterCount.configure({ limit: NOTE_LIMIT }),
       Placeholder.configure({ placeholder: "escrever uma nota…" }),
     ],
@@ -61,7 +58,6 @@ export function NoteEditor({ task, autoFocus = false }: Props) {
     onBlur: flush,
   });
 
-  // Ao desmontar (trocar de tela, fechar painel), grava o que estiver pendente.
   useEffect(() => flush, []);
 
   const holder = useRef<HTMLDivElement>(null);
@@ -83,7 +79,7 @@ export function NoteEditor({ task, autoFocus = false }: Props) {
       {editor && (
         <BubbleMenu editor={editor} className="bubble" shouldShow={({ state }) => !state.selection.empty}>
           <button
-            onMouseDown={(e) => e.preventDefault()} // não tira a seleção do editor
+            onMouseDown={(e) => e.preventDefault()}
             onClick={() => editor.chain().focus().toggleHighlight().run()}
             aria-label="Grifar (Ctrl+Shift+H)"
             title="Grifar (Ctrl+Shift+H)"

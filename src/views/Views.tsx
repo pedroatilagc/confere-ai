@@ -42,7 +42,7 @@ const MODES: { id: Mode; label: string }[] = [
 interface TodayProps {
   mode: Mode;
   onMode(m: Mode): void;
-  focusId?: string; // nota a focar ao abrir o modo Notas
+  focusId?: string;
 }
 
 export function Today({ mode, onMode, focusId }: TodayProps) {

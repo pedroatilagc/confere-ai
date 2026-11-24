@@ -3,8 +3,6 @@ import type { Task } from "../types";
 import { formatDay } from "../lib/dates";
 import { NoteEditor } from "../components/NoteEditor";
 
-// Uma folha por tarefa. Acima dela, um índice com as tarefas de hoje
-// para trocar de folha; só a nota escolhida aparece.
 export function NotesSheet({ tasks, focusId }: { tasks: Task[]; focusId?: string }) {
   const initial = focusId ?? tasks.find((t) => t.note)?.id ?? tasks[0]?.id;
   const [selectedId, setSelectedId] = useState(initial);
@@ -32,7 +30,6 @@ export function NotesSheet({ tasks, focusId }: { tasks: Task[]; focusId?: string
           </button>
         ))}
       </div>
-      {/* key: trocar de tarefa monta uma folha (e um editor) novos */}
       <div className="paper" key={task.id}>
         <Sheet task={task} autoFocus={focusOnOpen} />
       </div>
@@ -49,7 +46,6 @@ function Sheet({ task, autoFocus }: { task: Task; autoFocus: boolean }) {
   );
 }
 
-// Mesma folha, num painel por cima da tela (tarefas de outros dias).
 export function NoteOverlay({ task, onClose }: { task: Task; onClose(): void }) {
   return (
     <div

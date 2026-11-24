@@ -1,10 +1,9 @@
-/* ——— Tokens ——— */
 :root {
   --bg: #191919;
-  --surface: #202020;      /* hover, controles */
-  --surface-2: #262626;    /* item ativo */
+  --surface: #202020;
+  --surface-2: #262626;
   --line: rgba(247, 220, 158, 0.08);
-  --ink: #f7dc9e;          /* texto principal */
+  --ink: #f7dc9e;
   --ink-2: rgba(247, 220, 158, 0.62);
   --ink-3: rgba(247, 220, 158, 0.34);
   --serif: "Instrument Serif", Georgia, serif;
@@ -49,7 +48,6 @@ kbd {
   background: var(--surface);
 }
 
-/* ——— Layout ——— */
 .app { height: 100%; display: flex; flex-direction: column; }
 
 .page {
@@ -69,7 +67,6 @@ kbd {
   from { opacity: 0; transform: translateY(6px); }
 }
 
-/* ——— Navegação (topo, centralizada) ——— */
 .nav { display: flex; justify-content: center; padding: 18px 16px 0; }
 .nav-track {
   position: relative;
@@ -115,7 +112,6 @@ kbd {
   text-align: center;
 }
 
-/* ——— Cabeçalho ——— */
 .header {
   display: flex;
   justify-content: space-between;
@@ -159,7 +155,6 @@ kbd {
 }
 .segmented button.active { background: var(--surface-2); color: var(--ink); }
 
-/* ——— Progresso ——— */
 .progress { display: flex; align-items: center; gap: 10px; margin-bottom: 18px; }
 .progress-bar { flex: 1; height: 2px; background: var(--line); border-radius: 2px; overflow: hidden; }
 .progress-bar span {
@@ -171,7 +166,6 @@ kbd {
 }
 .progress-label { font-family: var(--mono); font-size: 11px; color: var(--ink-3); }
 
-/* ——— Lista ——— */
 .tasks, .history-list, .column ul { list-style: none; margin: 0; padding: 0; }
 
 .task {
@@ -195,7 +189,7 @@ kbd {
 
 .task-text {
   position: relative;
-  flex: 0 1 auto; /* largura = tamanho do texto, assim o risco acompanha o texto */
+  flex: 0 1 auto;
   min-width: 0;
   overflow-wrap: anywhere;
   cursor: text;
@@ -205,7 +199,6 @@ kbd {
 .task.done .task-text { color: var(--ink-3); }
 .task-edit { flex: 1; min-width: 0; }
 
-/* fazendo (vindo do kanban): um ponto sólido antes do texto */
 .task.doing .task-text::before {
   content: "";
   display: inline-block;
@@ -233,7 +226,6 @@ kbd {
 .task:hover .action, .task:focus-visible .action { opacity: 1; }
 .task-more:hover, .task-more[aria-expanded="true"] { color: var(--ink); background: var(--surface-2); }
 
-/* indicador de nota, ao lado do texto */
 .note-ind {
   flex: none;
   display: grid;
@@ -246,7 +238,8 @@ kbd {
 }
 .note-ind:hover { color: var(--ink); background: var(--surface-2); }
 
-/* ——— Menu ⋯ e confirmação ——— */
+.source-mark { flex: none; display: grid; place-items: center; color: var(--ink-3); opacity: 0.8; }
+
 .menu-wrap { position: relative; }
 .menu, .confirm {
   position: absolute;
@@ -300,7 +293,6 @@ kbd {
 .action:hover { color: var(--bg); background: var(--ink); }
 .tag { font-family: var(--mono); font-size: 11px; color: var(--ink-3); }
 
-/* ——— Checkbox (SVG desenhado à mão) ——— */
 .check { width: 22px; height: 22px; flex: none; display: grid; place-items: center; }
 .check svg { width: 100%; height: 100%; overflow: visible; }
 .check path { fill: none; stroke: var(--ink); stroke-linecap: round; stroke-linejoin: round; }
@@ -308,7 +300,6 @@ kbd {
 .check:hover .box { opacity: 0.9; }
 .check .tick { stroke-width: 2.2; stroke-dasharray: 1; animation: draw 260ms ease-out both; }
 
-/* marcador neutro no lugar do checkbox (Amanhã): mesmo tamanho, alinhamento não pula */
 .check-placeholder {
   width: 22px;
   height: 22px;
@@ -318,11 +309,10 @@ kbd {
   color: var(--ink-3);
 }
 
-/* ——— Risco da tarefa concluída ——— */
 .strike {
   position: absolute;
   left: -3px;
-  width: calc(100% + 6px); /* SVG é elemento "replaced": left+right não esticam, precisa de width explícito */
+  width: calc(100% + 6px);
   top: 52%;
   height: 0.7em;
   transform: translateY(-50%);
@@ -343,7 +333,6 @@ kbd {
   to { stroke-dashoffset: 0; }
 }
 
-/* ——— Nova tarefa ——— */
 .new-task {
   display: flex;
   align-items: center;
@@ -363,7 +352,6 @@ kbd {
 .new-task kbd { opacity: 0; transition: opacity 150ms; }
 .new-task kbd.visible { opacity: 1; }
 
-/* ——— Kanban ——— */
 .kanban { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 8px; }
 .column {
   min-height: 260px;
@@ -402,7 +390,6 @@ kbd {
 .col-done .card { opacity: 0.6; transition: opacity 150ms var(--ease), border-color 150ms; }
 .col-done .card:hover, .col-done .card.dragging { opacity: 1; }
 
-/* ——— Histórico ——— */
 .history-day { padding: 14px 0; border-top: 1px solid var(--line); }
 .history-head { display: flex; align-items: center; gap: 20px; }
 .history-head h2 {
@@ -421,11 +408,10 @@ kbd {
 .history-list .done .task-text { color: var(--ink-3); }
 .history-list .strike path { animation: none; }
 
-/* ——— Notas: folha de papel ——— */
 :root {
   --paper: #f7dc9e;
   --paper-ink: #191919;
-  --rule: 28px; /* altura da pauta = line-height do texto */
+  --rule: 28px;
 }
 .paper {
   position: relative;
@@ -433,9 +419,7 @@ kbd {
   color: var(--paper-ink);
   background-color: var(--paper);
   background-image:
-    /* margem vertical à esquerda */
     linear-gradient(90deg, transparent 47px, rgba(200, 70, 70, 0.22) 47px 48px, transparent 48px),
-    /* pautas */
     repeating-linear-gradient(to bottom, transparent 0 calc(var(--rule) - 1px), rgba(25, 25, 25, 0.08) calc(var(--rule) - 1px) var(--rule));
   border-radius: 4px;
   box-shadow: 0 1px 0 rgba(255, 255, 255, 0.04) inset, 0 18px 40px rgba(0, 0, 0, 0.45);
@@ -446,12 +430,9 @@ kbd {
 .paper ::selection { background: rgba(25, 25, 25, 0.15); }
 
 .paper { min-height: calc(var(--rule) * 12); }
-/* modo Notas: a página fica 20% mais larga (620 → 732px de conteúdo útil + padding)
-   e o resto do conteúdo volta para a largura normal; só a folha usa o espaço extra. */
 .page.notes { max-width: 732px; }
 .page.notes > :not(.paper) { margin-inline: 56px; }
 
-/* índice de tarefas acima da folha */
 .sheet-index {
   display: flex;
   gap: 6px;
@@ -502,7 +483,6 @@ kbd {
   font-style: italic;
 }
 
-/* marca-texto: coral translúcido que "multiplica" com o papel amarelo */
 .note-content mark {
   color: inherit;
   background: linear-gradient(
@@ -571,11 +551,94 @@ kbd {
 .paper-close { font-size: 12px; padding: 2px 8px; border-radius: 5px; color: rgba(25, 25, 25, 0.6); }
 .paper-close:hover { background: rgba(25, 25, 25, 0.08); color: var(--paper-ink); }
 
-/* ——— Ajuda ——— */
-.help-btn {
+.settings-close {
+  font-size: 12.5px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  color: var(--ink-2);
+  transition: color 150ms, background 150ms;
+}
+.settings-close:hover { color: var(--ink); background: var(--surface); }
+
+.settings-group {
+  padding: 20px 0;
+  border-top: 1px solid var(--line);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.settings-group h2 { margin: 0; font-size: 13px; font-weight: 500; color: var(--ink); }
+.field { display: flex; flex-direction: column; gap: 6px; }
+.field-label { font-size: 12.5px; color: var(--ink-2); }
+.input {
+  width: 100%;
+  padding: 9px 12px;
+  font-family: var(--mono);
+  font-size: 13px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  transition: border-color 150ms;
+}
+.input:focus { border-color: rgba(247, 220, 158, 0.3); }
+.input[readonly] { color: var(--ink-3); }
+.input::placeholder { color: var(--ink-3); }
+.hint { margin: 0; font-size: 12px; color: var(--ink-3); }
+.field .hint { margin: 0; }
+
+.secret { position: relative; }
+.secret .input { padding-right: 84px; }
+.secret-toggle {
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 11.5px;
+  padding: 4px 8px;
+  border-radius: 5px;
+  color: var(--ink-3);
+}
+.secret-toggle:hover { color: var(--ink); background: var(--surface-2); }
+
+.switch-row { display: flex; justify-content: space-between; align-items: center; gap: 16px; }
+.switch-row h2 { margin-bottom: 4px; }
+.switch {
+  position: relative;
+  flex: none;
+  width: 38px;
+  height: 22px;
+  border-radius: 999px;
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  transition: background 200ms var(--ease);
+}
+.switch span {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--ink-3);
+  transition: transform 200ms var(--ease), background 200ms;
+}
+.switch[aria-checked="true"] { background: var(--ink); }
+.switch[aria-checked="true"] span { transform: translateX(16px); background: var(--bg); }
+
+.settings-note { margin: 8px 0 0; font-size: 12px; color: var(--ink-3); line-height: 1.5; }
+.settings-note code { font-family: var(--mono); font-size: 11.5px; }
+
+.corner-btns {
   position: fixed;
   right: 16px;
   bottom: 14px;
+  display: flex;
+  gap: 6px;
+}
+.corner-btn {
+  display: grid;
+  place-items: center;
   width: 26px;
   height: 26px;
   border-radius: 50%;
@@ -585,7 +648,7 @@ kbd {
   border: 1px solid var(--line);
   transition: color 150ms, border-color 150ms;
 }
-.help-btn:hover { color: var(--ink); border-color: var(--ink-3); }
+.corner-btn:hover { color: var(--ink); border-color: var(--ink-3); }
 
 .help {
   position: fixed;
@@ -622,3 +685,6 @@ kbd {
   .nav-track button { padding: 7px 11px; }
   .history-head h2 { min-width: 0; }
 }
+
+input::-ms-reveal,
+input::-ms-clear { display: none; }

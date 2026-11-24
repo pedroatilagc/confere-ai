@@ -15,7 +15,6 @@ export function Nav({ view, onView }: { view: View; onView(v: View): void }) {
   const refs = useRef<Partial<Record<View, HTMLButtonElement | null>>>({});
   const [pill, setPill] = useState({ left: 0, width: 0 });
 
-  // Contadores ao lado de cada seção: o que ainda falta fazer em cada uma.
   const oldest = addDays(today, -6);
   const counts: Partial<Record<View, number>> = {
     today: tasks.filter((t) => t.date === today && t.status !== "done").length,
@@ -23,11 +22,10 @@ export function Nav({ view, onView }: { view: View; onView(v: View): void }) {
     pending: tasks.filter((t) => t.date < today && t.date >= oldest && t.status !== "done").length,
   };
 
-  // O destaque da aba ativa desliza até o botão selecionado.
   useLayoutEffect(() => {
     const measure = () => {
       const el = refs.current[view];
-      if (el) setPill({ left: el.offsetLeft, width: el.offsetWidth });
+      setPill(el ? { left: el.offsetLeft, width: el.offsetWidth } : (p) => ({ ...p, width: 0 }));
     };
     measure();
     window.addEventListener("resize", measure);

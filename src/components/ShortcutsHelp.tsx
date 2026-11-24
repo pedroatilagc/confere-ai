@@ -2,6 +2,7 @@ const SHORTCUTS: [string, string][] = [
   ["Ctrl 1–4", "Hoje · Amanhã · Pendentes · Histórico"],
   ["Ctrl K", "Alternar lista, kanban e notas"],
   ["Ctrl Shift H", "Grifar texto na nota"],
+  ["Ctrl ,", "Configurações"],
   ["N", "Nova tarefa"],
   ["↑ ↓", "Andar entre tarefas"],
   ["Espaço", "Concluir ou reabrir"],

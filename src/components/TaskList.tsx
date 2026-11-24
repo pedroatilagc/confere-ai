@@ -8,14 +8,13 @@ import { NewTask } from "./NewTask";
 
 interface Props {
   tasks: Task[];
-  date?: string; // presente = dá para adicionar e reordenar nesse dia
+  date?: string;
   extra?: (t: Task) => ReactNode;
   completable?: boolean;
 }
 
 export function TaskList({ tasks, date, extra, completable = true }: Props) {
   const { reorder } = useTasks();
-  // O arraste só começa depois de 6 px; assim clicar e editar continuam funcionando.
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 6 } }));
 
   const onDragEnd = ({ active, over }: DragEndEvent) => {

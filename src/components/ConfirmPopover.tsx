@@ -7,12 +7,11 @@ interface Props {
   onCancel(): void;
 }
 
-// Confirmação ancorada no item (não usa window.confirm).
 export function ConfirmPopover({ message, confirmLabel, onConfirm, onCancel }: Props) {
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    ref.current?.querySelector<HTMLElement>("button")?.focus(); // foco em "Cancelar": o lado seguro
+    ref.current?.querySelector<HTMLElement>("button")?.focus();
     const onDown = (e: PointerEvent) => {
       if (!ref.current?.contains(e.target as Node)) onCancel();
     };

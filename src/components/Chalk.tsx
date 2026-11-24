@@ -1,6 +1,3 @@
-// Traços de giz em SVG. pathLength={1} permite ao CSS "desenhar" o traço
-// animando stroke-dashoffset de 1 para 0.
-
 const STRIKES = [
   "M1 11 C 18 8, 38 13, 58 10 S 88 8, 99 12",
   "M1 10 C 14 13, 34 8, 54 11 S 84 13, 99 9",

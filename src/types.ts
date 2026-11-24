@@ -1,25 +1,34 @@
 import type { JSONContent } from "@tiptap/react";
 
 export type Status = "todo" | "doing" | "done";
+export type Source = "app" | "telegram";
 
-export const NOTE_LIMIT = 2000; // caracteres por nota
+export const NOTE_LIMIT = 2000;
 
 export interface Note {
-  doc: JSONContent; // documento do editor (árvore ProseMirror em JSON)
-  text: string; // versão em texto puro: busca, export, agente
-  updatedAt: string; // ISO
+  doc: JSONContent;
+  text: string;
+  updatedAt: string;
 }
 
 export interface Task {
-  id: string; // uuid
+  id: string;
   text: string;
-  date: string; // "YYYY-MM-DD" — dia (local) ao qual a tarefa pertence
+  date: string;
   status: Status;
   order: number;
-  createdAt: string; // ISO
+  createdAt: string;
   completedAt?: string;
-  note?: Note; // embutida: apagou a tarefa, a nota vai junto
+  note?: Note;
+  source?: Source;
 }
 
-export type View = "today" | "tomorrow" | "pending" | "history";
+export type AgentCommand = {
+  type: "add_task";
+  text: string;
+  date: string;
+  status?: "todo" | "doing";
+};
+
+export type View = "today" | "tomorrow" | "pending" | "history" | "settings";
 export type Mode = "list" | "kanban" | "notes";

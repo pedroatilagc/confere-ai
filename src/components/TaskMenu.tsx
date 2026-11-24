@@ -6,7 +6,6 @@ interface Props {
   onDelete(): void;
 }
 
-// Menu "⋯" da tarefa: abre com clique ou Enter, setas navegam, Esc/clique fora fecha.
 export function TaskMenu({ hasNote, onNotes, onDelete }: Props) {
   const [open, setOpen] = useState(false);
   const btn = useRef<HTMLButtonElement>(null);

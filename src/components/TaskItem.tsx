@@ -5,7 +5,7 @@ import type { Task } from "../types";
 import { useTasks } from "../state/TaskContext";
 import { useOpenNote } from "../state/noteOpener";
 import { ChalkCheckbox, Strike } from "./Chalk";
-import { NoteIcon } from "./Icons";
+import { NoteIcon, TelegramIcon } from "./Icons";
 import { TaskMenu } from "./TaskMenu";
 import { ConfirmPopover } from "./ConfirmPopover";
 
@@ -13,7 +13,7 @@ interface Props {
   task: Task;
   sortable: boolean;
   extra?: ReactNode;
-  completable?: boolean; // false em "Amanhã": não pode concluir nem marcar "fazendo"
+  completable?: boolean;
 }
 
 const focusEl = (el: Element | null) => (el as HTMLElement | null)?.focus();
@@ -52,10 +52,8 @@ export function TaskItem({ task, sortable, extra, completable = true }: Props) {
     if (li) focusEl(li.nextElementSibling ?? li.previousElementSibling);
     remove(task.id);
   };
-  // Com nota, pede confirmação; sem nota, apaga direto.
   const requestDelete = () => (task.note ? setConfirming(true) : doRemove());
 
-  // Teclado com o item (li) em foco.
   const onKeyDown = (e: KeyboardEvent<HTMLLIElement>) => {
     if (e.target !== e.currentTarget) return;
     const li = e.currentTarget;
@@ -123,6 +121,11 @@ export function TaskItem({ task, sortable, extra, completable = true }: Props) {
         <span className="task-text" onClick={() => setEditing(true)}>
           {task.text}
           {done && <Strike seed={task.id} />}
+        </span>
+      )}
+      {task.source === "telegram" && !editing && (
+        <span className="source-mark" title="Veio do Telegram" aria-label="Veio do Telegram">
+          <TelegramIcon />
         </span>
       )}
       {task.note && !editing && (

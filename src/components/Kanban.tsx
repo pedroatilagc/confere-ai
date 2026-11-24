@@ -22,7 +22,6 @@ export function Kanban({ tasks, date }: { tasks: Task[]; date: string }) {
   const { setStatus } = useTasks();
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 4 } }));
 
-  // Soltar numa coluna muda o status. São os mesmos dados da lista.
   const onDragEnd = ({ active, over }: DragEndEvent) => {
     const task = tasks.find((t) => t.id === active.id);
     const status = over?.id as Status | undefined;

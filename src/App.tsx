@@ -6,22 +6,26 @@ import { History, Pending, Today, Tomorrow } from "./views/Views";
 import { NoteOverlay } from "./views/NotesSheet";
 import { useTasks } from "./state/TaskContext";
 import { NoteOpenerContext } from "./state/noteOpener";
+import { useAgentInbox } from "./state/useAgentInbox";
+import { Settings } from "./views/Settings";
+import { GearIcon } from "./components/Icons";
 
 const MODE_CYCLE: Mode[] = ["list", "kanban", "notes"];
 
-// Teclas de atalho de uma letra não valem enquanto se digita (inputs e o editor de notas).
 const isTyping = (el: EventTarget | null) =>
   el instanceof HTMLElement && !!el.closest("input, textarea, [contenteditable='true']");
 
 export default function App() {
   const { tasks, today } = useTasks();
-  const [view, setView] = useState<View>("today"); // sempre abre em "hoje"
+  const [view, setView] = useState<View>("today");
   const [mode, setMode] = useState<Mode>("list");
   const [help, setHelp] = useState(false);
   const [focusId, setFocusId] = useState<string>();
   const [overlayId, setOverlayId] = useState<string>();
+  const [lastView, setLastView] = useState<View>("today");
 
-  // Nota de hoje → modo Notas com foco nela. Outro dia → painel por cima.
+  useAgentInbox();
+
   const openNote = useCallback(
     (task: Task) => {
       if (task.date === today) {
@@ -35,6 +39,12 @@ export default function App() {
     [today],
   );
 
+  const openSettings = () =>
+    setView((v) => {
+      if (v !== "settings") setLastView(v);
+      return "settings";
+    });
+
   const changeMode = (m: Mode) => {
     setFocusId(undefined);
     setMode(m);
@@ -47,9 +57,14 @@ export default function App() {
         setView(VIEWS[Number(e.key) - 1].id);
         return;
       }
+      if (e.ctrlKey && e.key === ",") {
+        e.preventDefault();
+        openSettings();
+        return;
+      }
       if (e.ctrlKey && e.key.toLowerCase() === "k") {
         e.preventDefault();
-        setView("today"); // os modos só existem em "hoje"
+        setView("today");
         setFocusId(undefined);
         setMode((m) => MODE_CYCLE[(MODE_CYCLE.indexOf(m) + 1) % MODE_CYCLE.length]);
         return;
@@ -82,10 +97,16 @@ export default function App() {
           {view === "tomorrow" && <Tomorrow />}
           {view === "pending" && <Pending />}
           {view === "history" && <History />}
+          {view === "settings" && <Settings onClose={() => setView(lastView)} />}
         </main>
-        <button className="help-btn" onClick={() => setHelp(true)} aria-label="Atalhos de teclado">
-          ?
-        </button>
+        <div className="corner-btns">
+          <button className="corner-btn" onClick={openSettings} aria-label="Configurações" title="Configurações (Ctrl + ,)">
+            <GearIcon />
+          </button>
+          <button className="corner-btn" onClick={() => setHelp(true)} aria-label="Atalhos de teclado" title="Atalhos (?)">
+            ?
+          </button>
+        </div>
         {help && <ShortcutsHelp onClose={() => setHelp(false)} />}
         {overlayTask && <NoteOverlay task={overlayTask} onClose={() => setOverlayId(undefined)} />}
       </div>
